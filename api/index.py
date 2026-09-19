@@ -5,9 +5,9 @@ from upstash_redis import Redis
 
 app = FastAPI()
 
-# Safe Environment Lookup
-UPSTASH_URL = os.getenv("UPSTASH_REDIS_REST_URL", "https://YOUR-UPSTASH-REST-URL.upstash.io")
-UPSTASH_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN", "YOUR-UPSTASH-REST-TOKEN")
+# Line 9 aur 10: Apni real Upstash credentials yahan paste karein
+UPSTASH_URL = os.getenv("UPSTASH_REDIS_REST_URL", "https://YOUR_ACTUAL_REST_URL.upstash.io")
+UPSTASH_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN", "YOUR_ACTUAL_REST_TOKEN")
 
 @app.get("/")
 def home():
@@ -26,12 +26,11 @@ async def verify_license(req: LicenseRequest):
     if not key or not client_hwid:
         raise HTTPException(status_code=400, detail="Missing key or HWID")
 
-    # Connect inside endpoint to catch invalid credentials gracefully
     try:
         redis = Redis(url=UPSTASH_URL, token=UPSTASH_TOKEN)
         stored_hwid = redis.get(key)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Redis Connection Failed: Check your REST_URL & TOKEN.")
+        raise HTTPException(status_code=500, detail="Redis Connection Failed: Check your REST_URL & TOKEN.")
 
     if stored_hwid is None:
         raise HTTPException(status_code=401, detail="Invalid License Key")
